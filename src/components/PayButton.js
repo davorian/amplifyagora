@@ -11,17 +11,12 @@ const stripeConfig = {
 
 const PayButton = ({product, user}) => {
 
-  const handleCharge = async (token) => {
-    console.log('token', token);
+  const handleCharge = async token => {
+    console.log('token!!!', token);
     try {
-      const result = await API.post('orderlambda', '/charge', {
-        body : JSON.stringify(token),
-        charge: {
-          currency: stripeConfig.currency,
-          amount: product.price,
-          description: product.description
-        }
-      });
+      const result = await API.post('orderlambda', '/charge', JSON.stringify({
+        body :  "X"
+      }));
       console.log('result',result);
     } catch (error) {
       console.error(error);
