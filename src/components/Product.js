@@ -1,10 +1,10 @@
 import React, {useState} from "react";
-import { Notification, Popover, Button, Dialog, Card, Form, Input, Radio, Progress } from "element-react";
+import { Notification, Popover, Button, Dialog, Card, Form, Input, Radio} from "element-react";
 import { convertPenceToPounds, convertPoundsToPence } from '../utils';
 import { UserContext} from '../App';
 import PayButton from './PayButton';
 import  {API, graphqlOperation} from 'aws-amplify';
-import { PhotoPicker, S3Image } from 'aws-amplify-react';
+import {  S3Image } from 'aws-amplify-react';
 import { deleteProduct, updateProduct } from '../graphql/mutations';
 
 const Product = ({product})  => {
@@ -24,7 +24,7 @@ const Product = ({product})  => {
         price:convertPoundsToPence(price)
       };
 
-      const result  = await API.graphql(graphqlOperation(updateProduct, {input}));
+      await API.graphql(graphqlOperation(updateProduct, {input}));
 
       Notification({
         title:'Success',
@@ -49,7 +49,7 @@ const Product = ({product})  => {
         id:productId
       };
 
-      const result  = await API.graphql(graphqlOperation(deleteProduct, {input}));
+      await API.graphql(graphqlOperation(deleteProduct, {input}));
 
       Notification({
         title:'Success',

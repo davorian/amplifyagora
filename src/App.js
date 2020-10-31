@@ -3,6 +3,10 @@ import { Auth, Hub } from 'aws-amplify';
 import { AmplifyTheme, Authenticator } from 'aws-amplify-react';
 import { BrowserRouter as Router, Route} from 'react-router-dom';
 
+import { API, graphqlOperation } from 'aws-amplify';
+import { getUser} from './graphql/queries';
+import { registerUser } from './graphql/mutations';//reqs { input:rUInput }
+
 import "./App.css";
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
@@ -34,10 +38,37 @@ const App = () => {
     console.dir(user);
   };
 
+  const registerNewUser = async signInData => {
+    const getUserInput = {
+      id:signInData.signInUserSession.idToken.payload.sub
+    };
+
+    const { data } = await API.graphql(graphqlOperation(getUser, getUserInput));
+
+    if (!data.getUser) {
+      try {
+        const registerUserInput = {
+          ...getUserInput,
+          username:signInData.username,
+          email: signInData.signInUserSession.idToken.payload.email,
+          registered: true
+        };
+
+        const newUser = await API.graphql(graphqlOperation(registerUser, {input: registerUserInput } ));
+        console.log('newUser', newUser);
+
+      } catch (error) {
+        console.error('Error registering new user', error);
+      }
+    }
+
+  };
+
   const onHubCapsule = capsule => {
     switch(capsule.payload.event) {
       case "signIn":
         getUserData();
+        registerNewUser(capsule.payload.data);
         break;
       case "signUp":
         break;

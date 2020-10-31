@@ -7,7 +7,7 @@ import {UserContext} from '../App';
 const NewMarket = ({handleSearchChange, handleClearSearch, handleSearch, isSearching, searchTerm}) => {
   const [addMarketDialog, setAddMarketDialog] = useState(false);
   const [marketName, setMarketName] = useState("");
-  const [tags, setTags] = useState(["Number", "Algebra", "Geometry and Measures", "Develop Fluency", "Reason Mathematically", "Solve Problems", "Probability", "Statistics", "Ratio, Proportion and Rates of Change" ]);
+  const [tags] = useState(["Number", "Algebra", "Geometry and Measures", "Develop Fluency", "Reason Mathematically", "Solve Problems", "Probability", "Statistics", "Ratio, Proportion and Rates of Change" ]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [options, setOptions] = useState([]);
   const handleAddMarket = async (user) => {
