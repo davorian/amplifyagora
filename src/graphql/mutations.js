@@ -268,8 +268,8 @@ export const createOrders = /* GraphQL */ `
         city
         country
         address_line1
-        address_state_county
-        address_zip_postcode
+        address_state
+        address_zip
       }
       createdAt
       updatedAt

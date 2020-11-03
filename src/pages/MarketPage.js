@@ -12,7 +12,7 @@ const getMarket = /* GraphQL */ `
     getMarket(id: $id) {
       id
       name
-      products {
+      products(sortDirection: DESC, limit: 999) {
         items {
           id
           description
@@ -125,11 +125,13 @@ const MarketPage = ( {marketId, user} ) => {
       updateProductListener.unsubscribe();
       deleteProductListener.unsubscribe();
     };
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     setShowProductUpdate(false);
     checkMarketOwner();
+  // eslint-disable-next-line
   }, [market, user]);
 
   return isLoading ? <Loading fullscreen={true} /> : (

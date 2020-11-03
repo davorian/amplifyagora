@@ -67,19 +67,18 @@ const NewMarket = ({handleSearchChange, handleClearSearch, handleSearch, isSearc
                 loading={isSearching}
                 onClick={handleSearch}>
                 Search
-
               </Button>
             </Form.Item>
         </Form>
       </div>
 
         <Dialog
-        title='Create New Market'
-        visible={addMarketDialog}
-        onCancel={()=>setAddMarketDialog(false)}
-        size='large'
-        customClass='dialog'
-      >
+          title='Create New Market'
+          visible={addMarketDialog}
+          onCancel={()=>setAddMarketDialog(false)}
+          size='large'
+          customClass='dialog'
+        >
         <Dialog.Body>
           <Form labelPosition='top'>
             <Form.Item label='Add Market Name'/>

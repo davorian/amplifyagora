@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { Auth, Hub } from 'aws-amplify';
-import { AmplifyTheme, Authenticator } from 'aws-amplify-react';
-import { BrowserRouter as Router, Route} from 'react-router-dom';
 
-import { API, graphqlOperation } from 'aws-amplify';
+import { Router, Route} from 'react-router-dom';
+import { createBrowserHistory } from 'history';
+//dep of r-r-d so we can still use even though not in pkg.json
+
+import { Auth, Hub,  API, graphqlOperation } from 'aws-amplify';
+import { AmplifyTheme, Authenticator } from 'aws-amplify-react';
 import { getUser} from './graphql/queries';
 import { registerUser } from './graphql/mutations';//reqs { input:rUInput }
 
-import "./App.css";
+import locale from 'element-react/src/locale/lang/en';
+import { i18n } from 'element-react';
+
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import MarketPage from './pages/MarketPage';
 import Navbar from './components/Navbar';
 
-import { i18n } from 'element-react';
-import locale from 'element-react/src/locale/lang/en';
+import "./assets/styles/App.css";
+import { ThemeProvider } from 'styled-components';
+import mainTheme from './assets/styles/theme';
+
+import { GlobalStyles } from './assets/styles/global';
 
 i18n.use(locale);
 
-const theme = {
+export const history = createBrowserHistory();
+
+const amplifyTheme = {
   ...AmplifyTheme,
   button: {
     ...AmplifyTheme.button,
@@ -26,16 +35,42 @@ const theme = {
   }
 };
 
+
+
 const UserContext = React.createContext();
 
 const App = () => {
 
   let [user, setUser] = useState(null);
+  let [userAttributes, setUserAttributes] = useState(null);
+  let [theme, setTheme] = useState('light');
+
+// The function that toggles between themes
+  const toggleTheme = () => {
+    // if the theme is not light, then set it to dark
+    if (theme === 'light') {
+      setTheme('dark');
+      // otherwise, it should be light
+    } else {
+      setTheme('light');
+    }
+  };
+
+
+  const getUserAttributes = async (authUserData) => {
+    const currentUserInfo = await Auth.currentUserInfo();
+    console.log('currentUserInfo',currentUserInfo);
+    if(currentUserInfo)
+      setUserAttributes(currentUserInfo.attributes);
+  };
+
+  useEffect(() => {
+    getUserAttributes(user);
+  }, [user]);
 
   const getUserData = async () => {
     user = await Auth.currentAuthenticatedUser();
     user ? setUser(user) : setUser(null);
-    console.dir(user);
   };
 
   const registerNewUser = async signInData => {
@@ -84,34 +119,40 @@ const App = () => {
     getUserData();
     Hub.listen('auth', onHubCapsule);
     console.dir(AmplifyTheme);
+  // eslint-disable-next-line
   },[]);
 
   const handleSignOut = async () => {
     try {
       await Auth.signOut();
+      window.location.href = '/';
     } catch (error) {
       console.log('error', error);
     }
   };
 
-  return !user ? <Authenticator theme={theme}/> : (
-     <UserContext.Provider value={{ user }}>
-      <Router>
-        <>
-          {/*Navbar*/}
-          <Navbar user={user} handleSignOut={handleSignOut}/>
-          {/*Routes*/}
-          <div className='app-container'>
-            <Route exact path='/' component={HomePage}/>
-            <Route path='/profile' component={ProfilePage}/>
-            <Route path='/markets/:marketId' component={({match}) => <MarketPage user={user} marketId={match.params.marketId} />} />
-          </div>
-        </>
-      </Router>
-     </UserContext.Provider>
+  return !userAttributes ? <Authenticator theme={amplifyTheme}/> : (
+    <ThemeProvider theme={theme === 'light' ? mainTheme.lightTheme :mainTheme.darkTheme}>
+      <GlobalStyles />
+          <button onClick={toggleTheme}>Toggle theme</button>
+      <h1>{`It's a ${theme} theme!`}</h1>
+      <UserContext.Provider value={{ user, userAttributes }}>
+        <Router history={history}>
+          <>
+            {/*Navbar*/}
+            <Navbar user={user} handleSignOut={handleSignOut}/>
+            {/*Routes*/}
+            <div >
+              <Route exact path='/' component={HomePage}/>
+              <Route path='/profile' component={() => <ProfilePage user={user} userAttributes={userAttributes}/>} />
+              <Route path='/markets/:marketId' component={({match}) => <MarketPage user={user} marketId={match.params.marketId} />} />
+            </div>
+          </>
+        </Router>
+      </UserContext.Provider>
+    </ThemeProvider>
     );
 };
 
-//export default withAuthenticator(App, true, [], null, theme);
 export default App;
 export { UserContext };

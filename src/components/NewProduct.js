@@ -21,7 +21,6 @@ const NewProduct = ({marketId}) => {
     setShipped(false);
     setDescription("");
     setPrice('');
-    setShipped(false);
     setImagePreview(null);
     setImage(null);
     setIsUploading(false);

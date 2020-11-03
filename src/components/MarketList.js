@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Context } from "react";
 import { Connect } from 'aws-amplify-react';
 import { graphqlOperation } from 'aws-amplify';
 import { listMarkets } from '../graphql/queries'
@@ -6,6 +6,7 @@ import { onCreateMarket } from '../graphql/subscriptions';
 import { Loading, Card, Icon, Tag } from "element-react";
 import Error from './Error';
 import { Link } from 'react-router-dom';
+import { Cart, Shop } from 'react-bootstrap-icons';
 
 const MarketList = ({searchResults, searchTerm}) => {
 
@@ -39,42 +40,34 @@ const MarketList = ({searchResults, searchTerm}) => {
               </h2>
             ): (
               <h2 className='header'>
-              <img src='https://icon.now.sh/store_mall_directory/527FFF'
-                   alt='Store Icon'
-                   className='large-icon'/>
+              <Shop className='app-icon'/>
                 Markets
               </h2>)}
             {markets.map(market => (
-              <div key={market.id} className='my-2'>
-                <Card
-                  bodyStyle={{
-                    padding: '0.7em',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}>
+              <div key={market.id} className='my-2' style={{display:'flex'}}>
+                <div className='body-style'>
                   <div>
-                   <span className='flex'>
+                   <span>
                      <Link className='link' to={`/markets/${market.id}`}>
                        {market.name}
                      </Link>
-                     <span style={{color: '#0f0f'}}>
-                       {market.products.items ? market.products.items.length:0}
+                     <span>
+                       {market.products.items ? ` ${market.products.items.length} `:' (0) '}
                      </span>
-                     <img src={"https://icon.now.sh/shopping_cart/f60"} alt='Shopping cart'/>
+                     <Cart />
                    </span>
-                    <div style={{color: '#0f0f'}}>
+                    <div>
                       {market.owner}
                     </div>
                   </div>
                   <div>
                     {market.tags && market.tags.map(tag => (
                       <Tag key={tag} type='danger' className='mx-1'>
-                        Tag
+                        {tag}
                       </Tag>
                     ))}
                   </div>
-                </Card>
+                </div>
               </div>
             ))}
           </>);

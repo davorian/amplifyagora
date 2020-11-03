@@ -89,6 +89,7 @@ body {
   height: 30px;
   padding-bottom: 5px;
   padding-right: 5px;
+  font-size: 2rem;
 }
 
 .app-user {
@@ -173,13 +174,24 @@ body {
   color: var(--lightSquidInk);
 }
 
+.body-style {
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 0.7em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
+}
+
 .link:hover {
   text-decoration: underline;
 }
 
 .header {
   color: var(--color-purple);
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   padding: 5px 10px;
   font-weight: 600;
   text-transform: uppercase;
