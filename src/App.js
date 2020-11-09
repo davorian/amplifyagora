@@ -123,6 +123,7 @@ const App = () => {
   },[]);
 
   const handleSignOut = async () => {
+    console.log('handleSignOut');
     try {
       await Auth.signOut();
       window.location.href = '/';
@@ -134,18 +135,17 @@ const App = () => {
   return !userAttributes ? <Authenticator theme={amplifyTheme}/> : (
     <ThemeProvider theme={theme === 'light' ? mainTheme.lightTheme :mainTheme.darkTheme}>
       <GlobalStyles />
-          <button onClick={toggleTheme}>Toggle theme</button>
-      <h1>{`It's a ${theme} theme!`}</h1>
+      <h1></h1>
       <UserContext.Provider value={{ user, userAttributes }}>
         <Router history={history}>
           <>
             {/*Navbar*/}
-            <Navbar user={user} handleSignOut={handleSignOut}/>
+            <Navbar user={user} toggleTheme={toggleTheme} theme={theme} handleSignOut={handleSignOut}/>
             {/*Routes*/}
             <div >
               <Route exact path='/' component={HomePage}/>
               <Route path='/profile' component={() => <ProfilePage user={user} userAttributes={userAttributes}/>} />
-              <Route path='/markets/:marketId' component={({match}) => <MarketPage user={user} marketId={match.params.marketId} />} />
+              <Route path='/markets/:marketId' component={({match}) => <MarketPage user={user} userAttributes={userAttributes} marketId={match.params.marketId} />} />
             </div>
           </>
         </Router>

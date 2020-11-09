@@ -49,11 +49,9 @@ const PayButton = ({product, userAttributes}) => {
           amount: product.price,
           description: product.description
         },
-        //userAttributes.email,
-        //ownerEmail
         email: {
-          customerEmail: 'don.fasanya@gmail.com',
-          ownerEmail: 'don.fasanya@gmail.com' ,
+          customerEmail: userAttributes.email,
+          ownerEmail,
           shipped: product.shipped
         }
       };

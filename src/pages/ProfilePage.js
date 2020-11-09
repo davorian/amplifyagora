@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import {API, Auth, graphqlOperation} from 'aws-amplify';
 // prettier-ignore
 import { Table, Button, Notification, MessageBox, Message, Tabs, Icon, Form, Dialog, Input, Card, Tag } from 'element-react'
-import { convertPenceToPounds } from '../utils';
+import { convertPenceToPounds, formatDateUKStyleWithTime24H } from '../utils';
 
 export const getUser =`
 query GetUser($id: ID!) {
@@ -23,24 +23,20 @@ query GetUser($id: ID!) {
             owner
             createdAt
           }
-          shippingAddress {
+          shippedAddress {
             city 
             country 
             address_line1 
             address_state 
             address_zip
           }
-        nextToken
       }
-      createdAt
-      updatedAt
     }
   }
 }
 `;
 
 const ProfilePage = ({user, userAttributes}) => {
-  console.log('userAttributes', userAttributes);
   const [orders, setOrders] = useState([]);
   const [email, setEmail] = useState(userAttributes.email);
   const [emailDialog, setEmailDialog] = useState(false);
@@ -48,9 +44,37 @@ const ProfilePage = ({user, userAttributes}) => {
   const [verificationCode, setVerificationCode] = useState('');
 
   const getUserOrders = async userId => {
-    const input = {id: userId};
-    const result = await API.graphql(graphqlOperation(getUser, input));
-    setOrders(result.data.getUser.orders.items);
+    try {
+      console.log('getUserOrders', userId);
+      const input = {id: userId};
+      const result = await API.graphql(graphqlOperation(getUser, input));
+      setOrders(result.data.getUser.orders.items);
+    }catch (error) {
+      Message.error(error.errors.map(err => err.message).reduce((str, nextStr) => '\n' + str + ' : ' + nextStr,''));
+    }
+  };
+
+  const handleDeleteProfile = () => {
+    MessageBox.confirm(
+      'This will permanently delete your account. Continue?',
+      'Attention!',
+      {
+        confirmButtonText: "Delete",
+        cancelButtonText: 'Cancel',
+        type:'warning'
+      }
+    ).then(async () => {
+      try {
+        await user.deleteUser();
+      }catch (error) {
+        console.log('error',error);
+      }
+    }).catch(() => {
+      Message({
+        type:'info',
+        message:'Delete cancelled'
+      });
+    });
   };
 
   const [columns] = useState([
@@ -60,7 +84,6 @@ const ProfilePage = ({user, userAttributes}) => {
         prop: 'tag', width: '150', render: row => {
           if (row.name === "Email") {
             const emailVerified = userAttributes.email_verified;
-            console.log('userAttributes', userAttributes);
             return emailVerified ?
               (<Tag type='success'>Verified</Tag>)
               :
@@ -86,6 +109,7 @@ const ProfilePage = ({user, userAttributes}) => {
               return (
                 <Button type='danger'
                         size='small'
+                        onClick={handleDeleteProfile}
                 >
                   Delete Profile
                 </Button>
@@ -101,9 +125,9 @@ const ProfilePage = ({user, userAttributes}) => {
 
   useEffect( () => {
     if (user) {
-       getUserOrders(userAttributes.sub);
+       getUserOrders(user.attributes.sub);
     }
-    }, [orders]
+    }, [user]
   );
 
 
@@ -212,11 +236,18 @@ const ProfilePage = ({user, userAttributes}) => {
           }
         >
           <h2 className='header'>Order History</h2>
-          {orders.map(order => {
-            const {
-              shippingAddress: {address_line1, city, address_state, country, address_zip},
-              product: {description, price}, id, createdAt
-            } = order;
+          {orders.length > 0 ? orders.map(order => {
+            console.log('orders', orders);
+
+              let { product:{description, price}, id, createdAt } = order;
+
+                let address_line1 = order.shippedAddress ? order.shippedAddress.address_line1: null;
+                let city = order.shippedAddress ? order.shippedAddress.city: null;
+                let address_state = order.shippedAddress ? order.shippedAddress.address_state: null;
+                let country = order.shippedAddress ? order.shippedAddress.country: null;
+                let address_zip = order.shippedAddress ? order.shippedAddress.address_zip: null;
+
+
             return ( userAttributes && (
               <div className='mb-1' key={id}>
                 <Card>
@@ -224,7 +255,7 @@ const ProfilePage = ({user, userAttributes}) => {
                       <p>Order Id: {id}</p>
                       <p>Product Description: {description}</p>
                       <p>Price: £{convertPenceToPounds(price)}</p>
-                      <p>Purchased on: {createdAt}</p>
+                      <p>Purchased on: {formatDateUKStyleWithTime24H(createdAt)}</p>
                       {address_line1 && (
                         <>
                           Shipping Address
@@ -241,7 +272,7 @@ const ProfilePage = ({user, userAttributes}) => {
                 </Card>
               </div>)
             )
-          })}
+          }) : null}
         </Tabs.Pane>
       </Tabs>
       {/*Email Dialog*/}

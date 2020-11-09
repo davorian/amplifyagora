@@ -6,6 +6,7 @@ import PayButton from './PayButton';
 import  {API, graphqlOperation} from 'aws-amplify';
 import {  S3Image } from 'aws-amplify-react';
 import { deleteProduct, updateProduct } from '../graphql/mutations';
+import { Link } from 'react-router-dom';
 
 const Product = ({product})  => {
 
@@ -72,7 +73,7 @@ const Product = ({product})  => {
         {({user, userAttributes}) => {
 
           const isProductOwner = userAttributes && userAttributes.sub === product.owner;
-
+          const isEmailVerified = userAttributes && userAttributes.email_verified;
           let div = <>
             <div className='card-container'>
               <Card bosyStyle={{padding: 0, minWidth: '200px'}}>
@@ -96,9 +97,14 @@ const Product = ({product})  => {
               <span className='mx-1'>
                 £{convertPenceToPounds(product.price)}
               </span>
-                    {!isProductOwner && (
+                    {isEmailVerified && !isProductOwner && (
                       <PayButton product={product} userAttributes={userAttributes}/>
                     )}
+                    {
+                      !isEmailVerified && <Link to='/profile'>
+                        Verify your email.
+                      </Link>
+                    }
                   </div>
                 </div>
               </Card>

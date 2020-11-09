@@ -14,8 +14,6 @@ d
 :
 
 src/App.js,1/e/1e43fa63aecd2127be034b3fb9d4caa172275714
-;
-src/App.css,a/a/aa7165aefcf8ee3d73539e99ab007daf1aa18d8d
 <
 src/index.js,f/9/f900edc44cb929c2267a16100a32851f6d5b477d
 H
@@ -123,3 +121,9 @@ G
 src/pages/MarketPage.js,4/5/45fbf881832cfaf5a94145a97e2ae6f04fee519f
 K
 src/components/PayButton.js,0/0/00523a6b6f6834fccfc2fe99f6b59284cbe4a989
+B
+.graphqlconfig.yml,3/f/3f943c18a8b99ec434e1ab886a96965a9c21b888
+D
+src/serviceWorker.js,9/2/920ab6ab4a57ee20a36df4e3e2e73b70f9969d14
+A
+public/index.html,f/4/f43ecdf8d666ee908aacce037b4cd72159e4741b

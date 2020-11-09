@@ -6,6 +6,7 @@ import {onCreateProduct, onDeleteProduct, onUpdateProduct} from '../graphql/subs
 import { Link } from 'react-router-dom';
 import NewProduct from '../components/NewProduct';
 import Product from '../components/Product';
+import { formatDateUKStyle } from '../utils';
 
 const getMarket = /* GraphQL */ `
   query GetMarket($id: ID!) {
@@ -35,12 +36,12 @@ const getMarket = /* GraphQL */ `
   }
 `;
 
-const MarketPage = ( {marketId, user} ) => {
+const MarketPage = ( {marketId, user, userAttributes} ) => {
   const [market, setMarket] = useState(null);
   const [showProductUpdate, setShowProductUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMarketOwner, setIsMarketOwner] = useState(false);
-
+  const [isEmailVerified , setIsEmailVerified] = useState(false);
 
 
   const checkMarketOwner = () => {
@@ -121,16 +122,25 @@ const MarketPage = ( {marketId, user} ) => {
 
     handleGetMarket();
     return () => {
-      createProductListener.unsubscribe();
-      updateProductListener.unsubscribe();
-      deleteProductListener.unsubscribe();
+      if(createProductListener) {
+        createProductListener.unsubscribe();
+        updateProductListener.unsubscribe();
+        deleteProductListener.unsubscribe();
+      }
     };
     // eslint-disable-next-line
   }, []);
 
+  const checkEmailVerified = () => {
+    if(userAttributes) {
+      setIsEmailVerified(userAttributes.email_verified);
+    }
+  };
+
   useEffect(() => {
     setShowProductUpdate(false);
     checkMarketOwner();
+    checkEmailVerified()
   // eslint-disable-next-line
   }, [market, user]);
 
@@ -147,7 +157,7 @@ const MarketPage = ( {marketId, user} ) => {
       <div className='items-center pt-2'>
         <span style={{color:'blue', paddingBottom:'1em'}}>
           <Icon className='icon' name='date'/>
-          {market.createdAt}
+          {formatDateUKStyle(market.createdAt)}
         </span>
       </div>
       {/*New Product*/}
@@ -162,7 +172,14 @@ const MarketPage = ( {marketId, user} ) => {
             }
             name='1'
             >
-            <NewProduct marketId={marketId}/>
+            {
+              isEmailVerified && <NewProduct marketId={marketId}/>
+            }
+            {
+              !isEmailVerified && <Link to='/profile' className='header'>
+                Verify your email before adding products.
+              </Link>
+            }
           </Tabs.Pane>)}
         {/*Products list*/}
           <Tabs.Pane label = {
