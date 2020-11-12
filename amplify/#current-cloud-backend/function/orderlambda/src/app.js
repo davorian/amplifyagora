@@ -15,10 +15,7 @@ const cors = require('cors');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 const AWS = require('aws-sdk');
 const config = {
-  adminEmail:'don.fasanya@gmail.com',
   region:'eu-west-2',
-  accessKeyId:'AKIAJQSCTBQZYIDYDDQA',
-  secretAccessKey:'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'
 };
 
 const ses = new AWS.SES(config);
