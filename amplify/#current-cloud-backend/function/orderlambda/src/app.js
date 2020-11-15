@@ -17,8 +17,8 @@ const AWS = require('aws-sdk');
 const config = {
   adminEmail:'don.fasanya@gmail.com',
   region:'eu-west-2',
-  accessKeyId:'AKIAJQSCTBQZYIDYDDQA',
-  secretAccessKey:'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'
+  accessKeyId:process.env.ACCESS_KEY_ID
+  secretAccessKey:process.env.SECRET_ACCESS_KEY
 };
 
 const ses = new AWS.SES(config);
